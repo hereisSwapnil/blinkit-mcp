@@ -1,10 +1,18 @@
 {
-    "manifest_version": "0.2",
+    "manifest_version": "0.3",
     "name": "blinkit-mcp",
-    "version": "0.1.0",
-    "description": "Blinkit MCP Server for Claude Desktop",
+    "display_name": "Blinkit MCP",
+    "version": "1.0.0",
+    "description": "Automate grocery shopping on Blinkit directly from Claude Desktop. Search, cart, and UPI payments.",
+    "long_description": "Blinkit MCP allows you to order groceries and essentials directly from Claude.\n\n**Key Features:**\n• **Smart Search**: Find products and view details\n• **Cart Management**: Add items and manage your cart\n• **UPI Payment Automation**: Select saved UPI IDs and pay instantly\n• **Secure Login**: Phone number & OTP authentication with local session persistence\n\n**Secure & Private** - Runs locally on your machine with Playwright.",
     "author": {
-        "name": "Swapnil Singh"
+        "name": "hereisswapnil",
+        "email": "swapnilskumars@gmail.com",
+        "url": "https://github.com/hereisSwapnil"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/hereisSwapnil/blinkit-mcp"
     },
     "icon": "assets/logo.png",
     "license": "MIT",
@@ -12,13 +20,70 @@
         "type": "python",
         "entry_point": "main.py",
         "mcp_config": {
-            "command": "python",
+            "command": "uv",
             "args": [
-                "${__dirname}/main.py"
+                "run",
+                "--directory",
+                "${__dirname}",
+                "main.py"
             ],
             "env": {
-                "PYTHONPATH": "${__dirname}"
+                "HEADLESS": "${user_config.HEADLESS}"
             }
         }
-    }
+    },
+    "user_config": {
+        "HEADLESS": {
+            "type": "string",
+            "title": "Headless Mode",
+            "description": "Run browser in headless mode (true/false)",
+            "required": false,
+            "sensitive": false
+        }
+    },
+    "tools": [
+        {
+            "name": "login",
+            "description": "Login to Blinkit using phone number"
+        },
+        {
+            "name": "enter_otp",
+            "description": "Verify login with OTP"
+        },
+        {
+            "name": "search",
+            "description": "Search for products on Blinkit"
+        },
+        {
+            "name": "add_to_cart",
+            "description": "Add a product to cart by result index"
+        },
+        {
+            "name": "check_cart",
+            "description": "View/Check cart status helpers"
+        },
+        {
+            "name": "checkout",
+            "description": "Proceed to checkout and select address"
+        },
+        {
+            "name": "get_upi_ids",
+            "description": "Get available UPI payment options"
+        },
+        {
+            "name": "select_upi_id",
+            "description": "Select a specific UPI ID for payment"
+        },
+        {
+            "name": "pay_now",
+            "description": "Click the final Pay Now button"
+        }
+    ],
+    "keywords": [
+        "blinkit",
+        "groceries",
+        "automation",
+        "shopping",
+        "upi"
+    ]
 }
