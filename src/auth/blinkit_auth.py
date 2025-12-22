@@ -51,8 +51,16 @@ class BlinkitAuth:
             )
 
         self.page = await self.context.new_page()
-        await self.page.goto("https://blinkit.com/")
-        print("Opened Blinkit.com")
+        try:
+            # Set a longer timeout (60s) and wait for 'domcontentloaded' which is faster than 'load'
+            await self.page.goto(
+                "https://blinkit.com/", timeout=60000, wait_until="domcontentloaded"
+            )
+            print("Opened Blinkit.com")
+        except Exception as e:
+            print(
+                f"Warning: Navigation to Blinkit took too long or failed: {e}. Attempting to proceed regardless."
+            )
 
         # Handle "Detect my location" popup if it appears
         try:
@@ -109,7 +117,7 @@ class BlinkitAuth:
             phone_input = await self.page.wait_for_selector(
                 "input[type='tel'], input[name='mobile'], input[type='text']",
                 state="visible",
-                timeout=5000,
+                timeout=30000,
             )
 
             if phone_input:
@@ -141,7 +149,7 @@ class BlinkitAuth:
         try:
             print("Waiting for OTP input...")
             # Wait for any input to be visible (4 digit boxes or single input)
-            await self.page.wait_for_selector("input", timeout=10000)
+            await self.page.wait_for_selector("input", timeout=30000)
 
             # Check for OTP inputs
             inputs = self.page.locator("input")
@@ -187,7 +195,8 @@ class BlinkitAuth:
                 return True
 
             return False
-        except:
+            return False
+        except Exception:
             return False
 
     async def save_session(self):

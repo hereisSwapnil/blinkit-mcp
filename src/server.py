@@ -45,6 +45,9 @@ class BlinkitContext:
             print("Browser not active or closed. Launching...")
             await self.auth.start_browser()
             self.order = BlinkitOrder(self.auth.page)
+        elif self.order is None and self.auth.page:
+            # Browser is active but order object missing (e.g. from partial failure or manual restart)
+            self.order = BlinkitOrder(self.auth.page)
 
 
 ctx = BlinkitContext()

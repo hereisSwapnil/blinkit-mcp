@@ -27,7 +27,7 @@ class BlinkitOrder:
             search_input = await self.page.wait_for_selector(
                 "input[placeholder*='Search'], input[type='text']",
                 state="visible",
-                timeout=5000,
+                timeout=30000,
             )
             await search_input.fill(product_name)
             await self.page.keyboard.press("Enter")
@@ -37,7 +37,7 @@ class BlinkitOrder:
             try:
                 # Wait for product cards
                 await self.page.wait_for_selector(
-                    "div[role='button']:has-text('ADD')", timeout=10000
+                    "div[role='button']:has-text('ADD')", timeout=30000
                 )
                 print("Search results loaded.")
             except Exception:
@@ -66,7 +66,7 @@ class BlinkitOrder:
             location_input = await self.page.wait_for_selector(
                 "input[name='select-locality'], input[placeholder*='search delivery location']",
                 state="visible",
-                timeout=5000,
+                timeout=30000,
             )
 
             await location_input.fill(location_name)
