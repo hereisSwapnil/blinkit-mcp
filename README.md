@@ -200,6 +200,11 @@ Licensed under the [MIT License](LICENSE).
 
 ---
 
-<p align="center">
   <b>Blinkit MCP turns Claude into your personal grocery assistant.</b>
 </p>
+
+---
+
+## ⚠️ Disclaimer
+
+This project is an **experimental** proof of concept and is **not affiliated, associated, authorized, endorsed by, or in any way officially connected with Blinkit (Grofers India Private Limited)**, or any of its subsidiaries or its affiliates. The official Blinkit website can be found at [blinkit.com](https://blinkit.com).
