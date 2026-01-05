@@ -4,7 +4,6 @@ from .base import BaseService
 class CheckoutService(BaseService):
     async def place_order(self):
         """Proceeds to checkout."""
-        print("Proceeding to Place Order...")
 
         if await self._is_store_closed():
             return "CRITICAL: Store is closed."
@@ -30,7 +29,9 @@ class CheckoutService(BaseService):
             # Try clicking Proceed again
             if await proceed_btn.is_visible():
                 await proceed_btn.click()
-                print("Clicked Proceed.")
+                print(
+                    "Cart checkout successfully.\nYou can select the payment method and proceed to pay."
+                )
                 await self.page.wait_for_timeout(3000)
             else:
                 print(

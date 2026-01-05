@@ -156,7 +156,6 @@ class CartService(BaseService):
 
     async def get_cart_items(self):
         """Checks items in the cart and returns the text content."""
-        print("Checking cart...")
         try:
             cart_btn = self.page.locator(
                 "div[class*='CartButton__Button'], div[class*='CartButton__Container']"
@@ -164,7 +163,6 @@ class CartService(BaseService):
 
             if await cart_btn.count() > 0:
                 await cart_btn.first.click()
-                print("Clicked My Cart.")
 
                 # Verify opening
                 try:
@@ -190,7 +188,7 @@ class CartService(BaseService):
 
                     # Scrape content
                     drawer = self.page.locator(
-                        "div[class*='CartDrawer'], div[class*='CartSidebar']"
+                        "div[class*='CartDrawer'], div[class*='CartSidebar'], div.cart-modal-rn, div[class*='CartWrapper__CartContainer']"
                     ).first
 
                     if await drawer.count() > 0:
@@ -200,6 +198,9 @@ class CartService(BaseService):
                             or "can't take your order" in content
                         ):
                             return "CRITICAL: Store is unavailable (Text detected in cart). Please try again later."
+                        print(
+                            "You can select address, or checkout, if you want to place the order."
+                        )
                         return content
 
                     if is_cart_active:
