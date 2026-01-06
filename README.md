@@ -2,7 +2,7 @@
   <img src="assets/logo.png" alt="Blinkit MCP Logo" width="120" height="120" style="border-radius:30px;">
 </p>
 
-<h1 align="center">Blinkit MCP</h1>
+<h1 align="center">Unofficial Blinkit MCP</h1>
 
 <p align="center">
   A Model Context Protocol (MCP) server that lets Claude Desktop browse, search, and order from Blinkit in real time.
