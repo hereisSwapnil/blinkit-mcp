@@ -107,3 +107,62 @@ class SearchService(BaseService):
             print(f"Error extracting search results: {e}")
 
         return results
+
+    async def check_product_availability_at_location(
+        self, product_name: str, location_name: str
+    ):
+        """
+        Check if a product is available at a specific location.
+        Returns availability status including store status and product availability.
+        """
+        print(f"Checking availability of '{product_name}' at '{location_name}'...")
+        result = {
+            "location": location_name,
+            "available": False,
+            "store_status": "unknown",
+            "products_found": [],
+            "error": None,
+        }
+
+        try:
+            # Import location service to change location
+            if not self.manager:
+                result["error"] = "Manager not available"
+                return result
+
+            # Set location
+            await self.manager.location_service.set_location(location_name)
+            await self.page.wait_for_timeout(2000)
+
+            # Check for store availability messages
+            if await self.page.is_visible("text=Currently unavailable"):
+                result["store_status"] = "unavailable"
+                print(f"Store is currently unavailable at {location_name}")
+                return result
+
+            if await self.page.is_visible("text=Store is closed"):
+                result["store_status"] = "closed"
+                print(f"Store is closed at {location_name}")
+                return result
+
+            result["store_status"] = "open"
+
+            # Search for the product
+            await self.search_product(product_name)
+            await self.page.wait_for_timeout(1500)
+
+            # Get search results
+            products = await self.get_search_results(limit=5)
+
+            if products:
+                result["available"] = True
+                result["products_found"] = products
+                print(f"Found {len(products)} products at {location_name}")
+            else:
+                print(f"No products found at {location_name}")
+
+        except Exception as e:
+            result["error"] = str(e)
+            print(f"Error checking availability at {location_name}: {e}")
+
+        return result

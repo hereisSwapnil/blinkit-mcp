@@ -50,6 +50,21 @@ class BlinkitOrder:
     async def get_search_results(self, limit=10):
         return await self.search_service.get_search_results(limit)
 
+    async def check_product_availability(self, product_name: str, locations: list):
+        """
+        Check product availability across multiple locations.
+        Returns a list of availability results for each location.
+        """
+        results = []
+        for location in locations:
+            result = (
+                await self.search_service.check_product_availability_at_location(
+                    product_name, location
+                )
+            )
+            results.append(result)
+        return results
+
     # --- Location Delegate ---
     async def set_location(self, location_name: str):
         return await self.location_service.set_location(location_name)

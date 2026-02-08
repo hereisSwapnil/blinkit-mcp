@@ -74,6 +74,10 @@
         {
             "name": "pay_now",
             "description": "Click the final Pay Now button"
+        },
+        {
+            "name": "check_availability_across_locations",
+            "description": "Check product availability across multiple locations or pincodes"
         }
     ],
     "keywords": [
