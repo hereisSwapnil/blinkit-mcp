@@ -79,7 +79,8 @@ https://github.com/user-attachments/assets/531f09ad-648a-4ee2-9271-5993ce637093
 | 🔎 **Smart Search** | Find products by name and get pricing/details |
 | 🛒 **Cart Management** | Add items, check cart status, and verify availability |
 | 📍 **Location** | Detect or manually set delivery location |
-| 💳 **Payment Automation** | **New!** Select saved UPI IDs or enter new ones automatically |
+| 🌍 **Multi-Location Check** | **New!** Check product availability across different pincodes/locations |
+| 💳 **Payment Automation** | Select saved UPI IDs or enter new ones automatically |
 | 🚀 **Checkout Flow** | Handles address selection and ordering flow seamlessly |
 
 ---
@@ -159,6 +160,7 @@ If you prefer to run from source:
 | `get_upi_ids` | List available UPI payment options |
 | `select_upi_id` | Select a specific UPI ID for payment |
 | `pay_now` | Click the final Pay Now button |
+| `check_availability_across_locations` | Check product availability across multiple pincodes/locations |
 
 ---
 
@@ -167,6 +169,8 @@ If you prefer to run from source:
 - *"Buy milk from Blinkit to my home and use my UPI for payment"*
 - *"Order 2 packets of Maggi and pay via UPI"*
 - *"Get me some chips, deliver to office, and checkout"*
+- *"Check if Amul milk is available in Mumbai 400001, Delhi 110001, and Bangalore 560001"*
+- *"Is bread available across pincodes in Maharashtra?"*
 
 ---
 

@@ -311,3 +311,51 @@ async def pay_now() -> str:
     with redirect_stdout(f):
         await ctx.order.click_pay_now()
     return f.getvalue()
+
+
+@mcp.tool()
+async def check_availability_across_locations(
+    product_name: str, locations: list[str]
+) -> str:
+    """
+    Check product availability across multiple locations/pincodes.
+    Useful to verify if a product is available in different areas.
+
+    Args:
+        product_name: Name of the product to search for
+        locations: List of location names or pincodes to check (e.g. ["Mumbai 400001", "Delhi 110001"])
+
+    Returns:
+        Availability status for each location including store status and products found.
+    """
+    await ctx.ensure_started()
+    f = io.StringIO()
+    with redirect_stdout(f):
+        print(
+            f"Checking availability of '{product_name}' across {len(locations)} locations..."
+        )
+        results = await ctx.order.check_product_availability(product_name, locations)
+
+        print(f"\n{'='*60}")
+        print(f"AVAILABILITY REPORT: {product_name}")
+        print(f"{'='*60}\n")
+
+        for result in results:
+            print(f"Location: {result['location']}")
+            print(f"  Store Status: {result['store_status']}")
+            print(f"  Available: {'Yes' if result['available'] else 'No'}")
+
+            if result.get("error"):
+                print(f"  Error: {result['error']}")
+            elif result["available"] and result["products_found"]:
+                print(f"  Products Found: {len(result['products_found'])}")
+                for product in result["products_found"][:3]:  # Show top 3
+                    print(f"    - {product['name']} at {product['price']}")
+            print()
+
+        # Summary
+        available_count = sum(1 for r in results if r["available"])
+        print(f"Summary: Product available in {available_count}/{len(results)} locations")
+        print(f"{'='*60}\n")
+
+    return f.getvalue()
