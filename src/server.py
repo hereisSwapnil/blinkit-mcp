@@ -311,3 +311,14 @@ async def pay_now() -> str:
     with redirect_stdout(f):
         await ctx.order.click_pay_now()
     return f.getvalue()
+
+
+@mcp.tool()
+async def get_order_history(count: int = 10) -> str:
+    """Fetch recent Blinkit order history in an LLM-friendly format: for each
+    order, its date, total, status, and the items bought (name, variant,
+    quantity, price). Use this to see what the user has ordered before and infer
+    recurring purchases when building an order. `count` sets how many recent
+    orders to fetch (default 10)."""
+    await ctx.ensure_started()
+    return await ctx.order.get_order_history(count)
