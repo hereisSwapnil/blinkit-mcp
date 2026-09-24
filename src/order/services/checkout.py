@@ -156,13 +156,16 @@ class CheckoutService(BaseService):
                 print("Clicked 'Pay Now'. Please approve the payment on your UPI app.")
                 return "Clicked Pay Now."
 
-            # Strategy 2: Text match on page
+            # Strategy 2: Text match on page — covers both UPI "Pay Now" and COD "Place Order"
+            import re as _re
             pay_btn_text = (
-                self.page.locator("div, button").filter(has_text="Pay Now").last
+                self.page.locator("div, button")
+                .filter(has_text=_re.compile(r"Pay Now|Place Order|Confirm Order", _re.IGNORECASE))
+                .last
             )
             if await pay_btn_text.count() > 0 and await pay_btn_text.is_visible():
                 await pay_btn_text.click()
-                print("Clicked 'Pay Now'.")
+                print("Clicked payment/order button.")
                 return "Clicked Pay Now."
 
             # Strategy 3: Check inside iframe

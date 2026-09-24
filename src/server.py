@@ -172,8 +172,9 @@ async def search(query: str) -> str:
         if results:
             print(f"\nFound {len(results)} results:")
             for item in results:
+                image_part = f" | IMG: {item['image_url']}" if item.get('image_url') else ""
                 print(
-                    f"[{item['index']}] ID: {item['id']} | {item['name']} - {item['price']}"
+                    f"[{item['index']}] ID: {item['id']} | {item['name']} - {item['price']}{image_part}"
                 )
         else:
             print("No results found.")
@@ -209,6 +210,170 @@ async def check_cart() -> str:
         content = await ctx.order.get_cart_items()
 
     return f.getvalue() + "\nCart Details:\n" + str(content)
+
+
+@mcp.tool()
+async def clear_cart() -> str:
+    """Remove ALL items from the cart. Use this before placing a fresh order."""
+    await ctx.ensure_started()
+    f = io.StringIO()
+    with redirect_stdout(f):
+        page = ctx.auth.page
+
+        # Open the cart drawer first — try cart button click
+        try:
+            cart_btn = page.locator(
+                "div[class*='CartButton__Button'], div[class*='CartButton__Container']"
+            ).first
+            if await cart_btn.count() > 0:
+                await cart_btn.click(timeout=5000, force=True)
+                await page.wait_for_timeout(1500)
+        except Exception as e:
+            print(f"Could not click cart button: {e}")
+
+        # JS-driven clearing — find all minus buttons in cart cards and click them
+        # repeatedly until the cart is empty. Much more reliable than per-locator clicks.
+        for sweep in range(30):
+            removed = await page.evaluate("""
+                () => {
+                    const cards = document.querySelectorAll(
+                        "div[class*='CartProduct__Container'], div[class*='DefaultProductCard__Container']"
+                    );
+                    if (cards.length === 0) return { count: 0, clicked: 0 };
+                    let clicked = 0;
+                    cards.forEach(card => {
+                        // Try multiple minus selectors inside the card
+                        const minus =
+                            card.querySelector("[class*='icon-minus']") ||
+                            card.querySelector("[class*='Minus']") ||
+                            (() => {
+                                const buttons = card.querySelectorAll("div, button");
+                                for (const b of buttons) {
+                                    if (b.innerText && b.innerText.trim() === "-") return b;
+                                }
+                                return null;
+                            })();
+                        if (minus) {
+                            // Walk up to find a clickable parent if minus is an icon
+                            let target = minus;
+                            for (let i = 0; i < 3 && target; i++) {
+                                target.click();
+                                clicked++;
+                                target = null;  // single click per pass; loop handles repeats
+                                break;
+                            }
+                        }
+                    });
+                    return { count: cards.length, clicked };
+                }
+            """)
+            await page.wait_for_timeout(400)
+            if removed["count"] == 0:
+                print(f"Cart empty after {sweep} sweeps.")
+                break
+            print(f"Sweep {sweep}: {removed['count']} cards, clicked minus on {removed['clicked']}.")
+            if removed["clicked"] == 0:
+                print("No minus buttons found — stopping.")
+                break
+        else:
+            print("Hit sweep limit (30).")
+
+        # Final verification
+        remaining = await page.locator(
+            "div[class*='CartProduct__Container'], div[class*='DefaultProductCard__Container']"
+        ).count()
+        print(f"clear_cart done. Remaining cards: {remaining}.")
+    return f.getvalue()
+
+
+@mcp.tool()
+async def select_address_by_label(label: str) -> str:
+    """Select a saved address by its label text (e.g. 'Home', 'Work').
+    Opens the address modal if needed and clicks the address whose label matches."""
+    await ctx.ensure_started()
+    f = io.StringIO()
+    with redirect_stdout(f):
+        page = ctx.auth.page
+        target_label = label.lower().strip()
+
+        # Ensure address modal is open — try multiple openers
+        modal_visible = await page.evaluate("""
+            () => !!document.body.innerText.match(/Select delivery address|Your saved addresses|Change Location/i)
+        """)
+
+        if not modal_visible:
+            # Try the LocationBar first (top of page)
+            try:
+                loc_bar = page.locator("div[class*='LocationBar__Container']").first
+                if await loc_bar.count() > 0 and await loc_bar.is_visible():
+                    await loc_bar.click(timeout=3000)
+                    await page.wait_for_timeout(1500)
+                    print("Clicked location bar.")
+            except Exception as e:
+                print(f"LocationBar click failed: {e}")
+
+            # If still not visible, try the cart drawer's "Change" button
+            modal_visible = await page.evaluate("""
+                () => !!document.body.innerText.match(/Select delivery address|Your saved addresses|Change Location/i)
+            """)
+            if not modal_visible:
+                try:
+                    change_btn = page.locator("div, button").filter(has_text="Change").last
+                    if await change_btn.count() > 0 and await change_btn.is_visible():
+                        await change_btn.click(timeout=3000, force=True)
+                        await page.wait_for_timeout(1500)
+                        print("Clicked Change button.")
+                except Exception as e:
+                    print(f"Change click failed: {e}")
+
+        # Now find and click the address whose label matches
+        clicked = await page.evaluate(f"""
+            () => {{
+                const target = "{target_label}";
+                const items = document.querySelectorAll(
+                    "div[class*='AddressList__AddressItemWrapper'], div[class*='AddressListItem__AddressItemWrapper']"
+                );
+                for (const item of items) {{
+                    const labelEl = item.querySelector("div[class*='AddressLabel']");
+                    const label = (labelEl ? labelEl.innerText : item.innerText).toLowerCase();
+                    if (label.includes(target)) {{
+                        item.click();
+                        return label;
+                    }}
+                }}
+                return null;
+            }}
+        """)
+        if clicked:
+            print(f"Selected address with label matching '{label}': {clicked}")
+        else:
+            print(f"No address found with label '{label}'.")
+        await page.wait_for_timeout(1500)
+    return f.getvalue()
+
+
+@mcp.tool()
+async def open_product_url(url: str) -> str:
+    """Navigate the browser directly to a Blinkit product URL.
+    Use this when you have an exact product URL and want to bypass search.
+    Returns the DOM product id of the loaded product (from URL prid=)."""
+    await ctx.ensure_started()
+    f = io.StringIO()
+    with redirect_stdout(f):
+        try:
+            await ctx.auth.page.goto(url, wait_until="domcontentloaded", timeout=20000)
+            await ctx.auth.page.wait_for_timeout(2000)
+            # Extract prid from URL
+            import re as _re
+            m = _re.search(r"/prid/(\d+)", url)
+            prid = m.group(1) if m else ""
+            # Try to find the product card on the page (PDP has the ADD button too)
+            print(f"Navigated to {url}")
+            if prid:
+                print(f"Product id from URL: {prid}")
+        except Exception as e:
+            print(f"Error navigating to {url}: {e}")
+    return f.getvalue()
 
 
 @mcp.tool()

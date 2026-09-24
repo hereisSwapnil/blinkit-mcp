@@ -120,12 +120,18 @@ class CartService(BaseService):
                 # Wait for the counter to initialize
                 await self.page.wait_for_timeout(1000)
 
-                # Robust strategy to find the + button
-                plus_btn = card.locator(".icon-plus").first
+                # Try multiple selectors — .icon-plus is stale in current Blinkit DOM
+                plus_btn = card.locator(
+                    "[class*='increment' i], [class*='Increment'], "
+                    "[class*='plus' i], [class*='Plus'], "
+                    "[aria-label*='increase' i], [aria-label*='increment' i]"
+                ).first
+                if await plus_btn.count() == 0:
+                    plus_btn = card.locator(".icon-plus").first
                 if await plus_btn.count() > 0:
                     plus_btn = plus_btn.locator("..")
-                else:
-                    plus_btn = card.locator("text='+'").first
+                if await plus_btn.count() == 0:
+                    plus_btn = card.locator("div, button").filter(has_text="+").last
 
                 if await plus_btn.is_visible():
                     for i in range(items_to_add):

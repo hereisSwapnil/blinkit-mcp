@@ -138,8 +138,16 @@ class SearchService(BaseService):
                             price = part.strip()
                             break
 
+                # Extract image URL
+                image_url = ""
+                img_locator = card.locator("img")
+                if await img_locator.count() > 0:
+                    src = await img_locator.first.get_attribute("src")
+                    if src and src.startswith("http"):
+                        image_url = src
+
                 results.append(
-                    {"index": i, "id": product_id, "name": name, "price": price}
+                    {"index": i, "id": product_id, "name": name, "price": price, "image_url": image_url}
                 )
 
         except Exception as e:

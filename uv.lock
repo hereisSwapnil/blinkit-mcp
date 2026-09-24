@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = ">=3.12"
 
 [[package]]
@@ -35,17 +35,19 @@ wheels = [
 
 [[package]]
 name = "blinkit-mcp"
-version = "1.0.1"
+version = "1.0.2"
 source = { virtual = "." }
 dependencies = [
     { name = "mcp" },
     { name = "playwright" },
+    { name = "python-dotenv" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "mcp" },
     { name = "playwright" },
+    { name = "python-dotenv" },
 ]
 
 [[package]]
