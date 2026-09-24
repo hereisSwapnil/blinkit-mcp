@@ -28,6 +28,7 @@ Your AI can:
 - 📍 Manage delivery locations
 - 💳 Automate checkout and UPI payments
 - 🔐 Login securely with phone and OTP
+- 📜 Review past orders and recurring buying patterns
 
 No manual clicking required. Just ask Claude to buy milk.
 
@@ -159,6 +160,7 @@ If you prefer to run from source:
 | `get_upi_ids` | List available UPI payment options |
 | `select_upi_id` | Select a specific UPI ID for payment |
 | `pay_now` | Click the final Pay Now button |
+| `get_order_history` | Fetch recent orders (date, total, status, and items) in an LLM-friendly format |
 
 ---
 
@@ -185,7 +187,8 @@ blinkit-mcp/
 │   │       ├── search.py      # Search logic
 │   │       ├── location.py    # Location logic
 │   │       ├── cart.py        # Cart logic
-│   │       └── checkout.py    # Checkout & Payment logic
+│   │       ├── checkout.py    # Checkout & Payment logic
+│   │       └── history.py     # Order history logic
 │   └── server.py          # MCP Tool definitions
 ├── test/
 │   └── cli.py             # CLI for testing independent of Claude

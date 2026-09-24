@@ -3,6 +3,7 @@ from .services.search import SearchService
 from .services.location import LocationService
 from .services.cart import CartService
 from .services.checkout import CheckoutService
+from .services.history import HistoryService
 
 
 class BlinkitOrder:
@@ -18,6 +19,7 @@ class BlinkitOrder:
         self.location_service = LocationService(page, self)
         self.cart_service = CartService(page, self)
         self.checkout_service = CheckoutService(page, self)
+        self.history_service = HistoryService(page, self)
 
         # Attach blocking listener for debugging specific relevant errors
         self.page.on("response", self._handle_response)
@@ -79,3 +81,7 @@ class BlinkitOrder:
 
     async def click_pay_now(self):
         return await self.checkout_service.click_pay_now()
+
+    # --- History Delegate ---
+    async def get_order_history(self, count: int = 10) -> str:
+        return await self.history_service.get_order_history(count)

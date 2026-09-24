@@ -5,7 +5,7 @@ import asyncio
 # Add project root to Python path to allow importing from src
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from src.auth.blinkit_auth import BlinkitAuth
+from src.auth import BlinkitAuth
 from src.order.blinkit_order import BlinkitOrder
 
 
@@ -55,6 +55,7 @@ async def main():
         print("  search <query>   : Search for products (default: milk)")
         print("  add <index>      : Add item at index to cart")
         print("  cart             : View/Check cart status")
+        print("  history [n]      : Show last n orders (default 10)")
         print("  checkout         : Proceed to checkout & address selection")
         print("  address          : Manually trigger address selection")
         print("  login            : Re-initiate login flow")
@@ -78,7 +79,7 @@ async def main():
 
                 elif cmd == "help":
                     print(
-                        "Commands: search <query>, add <index>, cart, checkout, address, login, quit"
+                        "Commands: search <query>, add <index>, cart, history [n], checkout, address, login, quit"
                     )
 
                 elif cmd == "login":
@@ -111,6 +112,10 @@ async def main():
 
                 elif cmd == "cart":
                     await order.get_cart_items()
+
+                elif cmd == "history":
+                    n = int(args[0]) if args and args[0].isdigit() else 10
+                    print(await order.get_order_history(n))
 
                 elif cmd == "address":
                     addresses = await order.get_saved_addresses()
