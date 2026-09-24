@@ -2,9 +2,9 @@
     "manifest_version": "0.3",
     "name": "blinkit-mcp",
     "display_name": "Blinkit MCP",
-    "version": "1.0.2",
+    "version": "1.1.0",
     "description": "Automate grocery shopping on Blinkit directly from Claude Desktop. Search, cart, and UPI payments.",
-    "long_description": "Blinkit MCP allows you to order groceries and essentials directly from Claude.\n\n**Key Features:**\n• **Smart Search**: Find products and view details\n• **Cart Management**: Add items and manage your cart\n• **UPI Payment Automation**: Select saved UPI IDs and pay instantly\n• **Secure Login**: Phone number & OTP authentication with local session persistence\n\n**Secure & Private** - Runs locally on your machine with Playwright.",
+    "long_description": "Blinkit MCP allows you to order groceries and essentials directly from Claude.\n\n**Key Features:**\n• **Smart Search**: Find products and view details\n• **Cart Management**: Add items and manage your cart\n• **UPI Payment Automation**: Select saved UPI IDs and pay instantly\n• **Order History**: Review past orders and item details\n• **Secure Login**: Phone number & OTP authentication with local session persistence\n\n**Secure & Private** - Runs locally on your machine with Playwright.",
     "author": {
         "name": "hereisswapnil",
         "email": "swapnilskumars@gmail.com",
@@ -74,6 +74,10 @@
         {
             "name": "pay_now",
             "description": "Click the final Pay Now button"
+        },
+        {
+            "name": "get_order_history",
+            "description": "Fetch recent order history including order dates, totals, statuses, and item breakdowns"
         }
     ],
     "keywords": [

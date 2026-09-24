@@ -64,7 +64,7 @@ https://github.com/user-attachments/assets/531f09ad-648a-4ee2-9271-5993ce637093
    ```
 
 3. **Download the MCP bundle**  
-   👉 [blinkit-mcp.mcpb](https://github.com/hereisSwapnil/blinkit-mcp/releases/download/v1.0.2/blinkit-mcp.mcpb)
+   👉 [blinkit-mcp.mcpb](https://github.com/hereisSwapnil/blinkit-mcp/releases/download/v1.1.0/blinkit-mcp.mcpb)
 
 4. **Double-click** the `.mcpb` file — Claude Desktop installs it automatically.
 
@@ -90,7 +90,7 @@ https://github.com/user-attachments/assets/531f09ad-648a-4ee2-9271-5993ce637093
 Download and install directly in Claude Desktop:
 
 <p align="center">
-  <a href="https://github.com/hereisSwapnil/blinkit-mcp/releases/download/v1.0.2/blinkit-mcp.mcpb">
+  <a href="https://github.com/hereisSwapnil/blinkit-mcp/releases/download/v1.1.0/blinkit-mcp.mcpb">
     <img src="https://img.shields.io/badge/Download-blinkit--mcp.mcpb-orange?style=for-the-badge" alt="Download">
   </a>
 </p>

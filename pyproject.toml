@@ -1,6 +1,6 @@
 [project]
 name = "blinkit-mcp"
-version = "1.0.2"
+version = "1.1.0"
 description = "Automate grocery shopping on Blinkit directly from Claude Desktop. Search, cart, and UPI payments."
 readme = "README.md"
 requires-python = ">=3.12"

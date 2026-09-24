@@ -174,8 +174,14 @@ class BlinkitAuth:
                     # Fallback: fill generic input
                     await self.page.fill("input", otp)
 
-            print("Entered OTP. Waiting for auto-submit or button...")
+            print("Entered OTP. Waiting for authentication response...")
             await self.page.keyboard.press("Enter")
+            await self.page.wait_for_timeout(3000)
+
+            # Check if login succeeded and save session immediately
+            if await self.is_logged_in():
+                await self.save_session()
+                print("Successfully logged in and session saved.")
 
         except Exception as e:
             print(f"Error entering OTP: {e}")
@@ -186,15 +192,35 @@ class BlinkitAuth:
             return False
 
         try:
-            if await self.page.is_visible(
-                "text=My Account"
-            ) or await self.page.is_visible(".user-profile"):
+            # 1. Check Blinkit localStorage for active auth accessToken or phoneNumber
+            is_authenticated = await self.page.evaluate("""
+                () => {
+                    try {
+                        const auth = JSON.parse(localStorage.getItem('auth') || '{}');
+                        if (auth.accessToken || auth.phoneNumber) return true;
+                        
+                        const user = JSON.parse(localStorage.getItem('user') || '{}');
+                        if (user.profile && (user.profile.phone || user.profile.id || user.profile.name)) return true;
+                    } catch (e) {}
+                    return false;
+                }
+            """)
+            if is_authenticated:
                 return True
 
-            if not await self.page.is_visible("text=Login"):
+            # 2. Check header profile button: If it contains "Login", user is NOT logged in
+            profile_btn = self.page.locator("div[class*='ProfileButton__Container']")
+            if await profile_btn.count() > 0:
+                btn_text = (await profile_btn.first.inner_text()).strip()
+                if "Login" in btn_text:
+                    return False
+                elif btn_text:
+                    return True
+
+            # 3. Check for "My Account" or profile elements
+            if await self.page.is_visible("text=My Account") or await self.page.is_visible(".user-profile"):
                 return True
 
-            return False
             return False
         except Exception:
             return False
